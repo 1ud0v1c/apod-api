@@ -15,6 +15,10 @@ import re
 import urllib3 as urllib
 # import urllib.request
 
+from requests import get
+from io import BytesIO
+from PIL import Image
+
 LOG = logging.getLogger(__name__)
 logging.basicConfig(level=logging.WARN)
 
@@ -111,8 +115,16 @@ def _get_apod_chars(dt, thumbs):
         if thumbs.lower() == "true":
             props['thumbnail_url'] = _get_thumbs(data)
 
+    # TODO: improve catch potential exception + check media_type
+    props['width'], props['height'] = _get_image_size(props['url'])
+    
     return props
 
+# @see https://stackoverflow.com/questions/51116907/beatifulsoup-how-to-get-image-size-by-url
+def _get_image_size(image_url):
+    image_raw = get(image_url)
+    image = Image.open(BytesIO(image_raw.content))
+    return image.size
 
 def _title(soup):
     """
