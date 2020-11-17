@@ -115,16 +115,23 @@ def _get_apod_chars(dt, thumbs):
         if thumbs.lower() == "true":
             props['thumbnail_url'] = _get_thumbs(data)
 
-    # TODO: improve catch potential exception + check media_type
-    props['width'], props['height'] = _get_image_size(props['url'])
+    props['width'], props['height'] = _get_image_size(props['media_type'], props['url'])
     
     return props
 
-# @see https://stackoverflow.com/questions/51116907/beatifulsoup-how-to-get-image-size-by-url
-def _get_image_size(image_url):
-    image_raw = get(image_url)
-    image = Image.open(BytesIO(image_raw.content))
-    return image.size
+# If, we succeed to download the image we return it is size, otherwise if we have any errors, 
+# we return (-1,-1).
+# @see: https://stackoverflow.com/questions/51116907/beatifulsoup-how-to-get-image-size-by-url
+def _get_image_size(media_type, image_url):
+    if media_type != 'image':
+        return (-1,-1)
+    try:
+        image_raw = get(image_url)
+        image = Image.open(BytesIO(image_raw.content))
+        return image.size
+    except requests.exceptions.RequestException as request_exception:
+        print("An exception occurred while reading the image size: " + str(request_exception))
+        return (-1,-1)
 
 def _title(soup):
     """

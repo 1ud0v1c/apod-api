@@ -105,6 +105,3 @@ class TestApod(unittest.TestCase):
         for page_type in TestApod.TEST_DATA.keys():
             self._test_harness(page_type, TestApod.TEST_DATA[page_type]) 
         
-        
-        
-        
